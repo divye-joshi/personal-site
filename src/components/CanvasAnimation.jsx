@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 // ─── Character sets ───────────────────────────────────────────────────────────
-const NUMBERS  = '0123456789%#@*!'.split('');
-const LETTERS  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?-!:\'_ '.split('');
+const NUMBERS = '0123456789%#@*!'.split('');
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?-!:\'_ '.split('');
 const ALL_CHARS = [...new Set([...NUMBERS, ...LETTERS])].filter(c => c !== ' ');
 
 const COLORS = ['#ffffff', '#00ffff', '#55ff55', '#ff8888'];
@@ -56,8 +56,8 @@ export const SECTIONS = [
     ],
     links: [
       { icon: 'linkedin', url: 'https://in.linkedin.com/in/divye-joshi' },
-      { icon: 'scholar',  url: 'https://scholar.google.com/citations?user=ztXtDjUAAAAJ&hl=en' },
-      { icon: 'github',   url: 'https://github.com/divye-joshi?tab=repositories' },
+      { icon: 'scholar', url: 'https://scholar.google.com/citations?user=ztXtDjUAAAAJ&hl=en' },
+      { icon: 'github', url: 'https://github.com/divye-joshi?tab=repositories' },
     ],
   },
   {
@@ -72,33 +72,28 @@ export const SECTIONS = [
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function distToBox(x, y, box) {
   const dx = Math.max(box.left - x, 0, x - box.right);
-  const dy = Math.max(box.top  - y, 0, y - box.bottom);
+  const dy = Math.max(box.top - y, 0, y - box.bottom);
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function isMobileViewport(w) { return w < 900; }
-
 // ─── Text layout ──────────────────────────────────────────────────────────────
 function layoutText(section, cw, ch, ctx) {
-  const mobile = isMobileViewport(cw);
-  const fontSize   = mobile ? 18 : 22;
+  const fontSize = 22;
   const lineHeight = fontSize * 1.5;
 
   ctx.font = `600 ${fontSize}px "Outfit", sans-serif`;
 
   const layout = {
-    left:   mobile ? cw * 0.05  : cw * 0.40,
-    right:  mobile ? cw * 0.95  : cw * 0.95,
-    top:    Math.max(mobile ? ch * 0.40 : ch * 0.10, 150),
-    bottom: mobile ? ch * 0.95  : ch * 0.90,
+    left: cw * 0.40,
+    right: cw * 0.95,
+    top: Math.max(ch * 0.10, 150),
+    bottom: ch * 0.90,
   };
 
-  const photoZone = mobile
-    ? { left: cw * 0.20, right: cw * 0.80, top: ch * 0.05, bottom: ch * 0.35 }
-    : { left: cw * 0.05, right: cw * 0.35, top: ch * 0.10, bottom: ch * 0.90 };
+  const photoZone = { left: cw * 0.05, right: cw * 0.35, top: ch * 0.10, bottom: ch * 0.90 };
 
-  const startX   = layout.left + (mobile ? 20 : 60);
-  const maxWidth = (layout.right - layout.left) - (mobile ? 40 : 120);
+  const startX = layout.left + 60;
+  const maxWidth = (layout.right - layout.left) - 120;
 
   // ── Word-wrap into lines ──
   const lines = [];
@@ -132,9 +127,11 @@ function layoutText(section, cw, ch, ctx) {
         const ch2 = chunk.word[i];
         const cw2 = ctx.measureText(ch2).width;
         if (ch2 !== ' ') {
-          nodes.push({ char: ch2, originalChar: ch2, x: cx2 + cw2 / 2, y: cy, color: chunk.color,
+          nodes.push({
+            char: ch2, originalChar: ch2, x: cx2 + cw2 / 2, y: cy, color: chunk.color,
             particles: [], assembledCount: 0, isAssembled: false,
-            glitchTimer: 0, glitchOffsetX: 0, glitchOffsetY: 0 });
+            glitchTimer: 0, glitchOffsetX: 0, glitchOffsetY: 0
+          });
         }
         cx2 += cw2;
       }
@@ -149,16 +146,16 @@ function layoutText(section, cw, ch, ctx) {
     if (n.y < minY) minY = n.y; if (n.y > maxY) maxY = n.y;
   });
 
-  const centerX   = (minX + maxX) / 2;
-  const minWidth  = section.links ? 450 : 270;
-  const calcW     = Math.max((maxX - minX) + 90, minWidth);
+  const centerX = (minX + maxX) / 2;
+  const minWidth = section.links ? 450 : 270;
+  const calcW = Math.max((maxX - minX) + 90, minWidth);
 
   const textZone = nodes.length > 0 ? {
-    left:   centerX - calcW / 2,
-    right:  centerX + calcW / 2,
-    top:    minY - 45,
+    left: centerX - calcW / 2,
+    right: centerX + calcW / 2,
+    top: minY - 45,
     bottom: maxY + 110,
-    width:  calcW,
+    width: calcW,
     height: (maxY - minY) + 155,
   } : null;
 
@@ -168,21 +165,21 @@ function layoutText(section, cw, ch, ctx) {
 // ─── Particle class ───────────────────────────────────────────────────────────
 class Particle {
   constructor(cw, ch) {
-    this.x           = Math.random() * cw;
-    this.y           = Math.random() * ch;
-    this.baseSize    = Math.random() * 24 + 16;
-    this.density     = Math.random() * 30 + 1;
-    this.char        = NUMBERS[Math.floor(Math.random() * NUMBERS.length)];
+    this.x = Math.random() * cw;
+    this.y = Math.random() * ch;
+    this.baseSize = Math.random() * 24 + 16;
+    this.density = Math.random() * 30 + 1;
+    this.char = NUMBERS[Math.floor(Math.random() * NUMBERS.length)];
     this.baseOpacity = Math.random() * 0.5 + 0.2;
-    this.vx          = (Math.random() - 0.5) * 1.2;
-    this.vy          = (Math.random() - 0.5) * 1.2;
-    this.angle       = Math.random() * Math.PI * 2;
-    this.angleSpeed  = Math.random() * 0.08 + 0.02;
+    this.vx = (Math.random() - 0.5) * 1.2;
+    this.vy = (Math.random() - 0.5) * 1.2;
+    this.angle = Math.random() * Math.PI * 2;
+    this.angleSpeed = Math.random() * 0.08 + 0.02;
     this.danceRadius = Math.random() * 2 + 0.5;
-    this.morphSpeed  = Math.random() * 0.06 + 0.03;
+    this.morphSpeed = Math.random() * 0.06 + 0.03;
     // assigned externally
-    this.node              = null;
-    this.isHidden          = false;
+    this.node = null;
+    this.isHidden = false;
     this.isEternalBackground = false;
   }
 
@@ -211,10 +208,10 @@ class Particle {
     } else {
       this.x += this.vx;
       this.y += this.vy;
-      if (this.x >  cw + 50) this.x = -50;
-      if (this.x < -50)      this.x = cw + 50;
-      if (this.y >  ch + 50) this.y = -50;
-      if (this.y < -50)      this.y = ch + 50;
+      if (this.x > cw + 50) this.x = -50;
+      if (this.x < -50) this.x = cw + 50;
+      if (this.y > ch + 50) this.y = -50;
+      if (this.y < -50) this.y = ch + 50;
 
       if (!window.disableParticleHover) {
         const dx = mouse.x - this.x;
@@ -235,9 +232,9 @@ class Particle {
     if (this.node && this.node.isAssembled) return;
 
     const sinA = Math.sin(this.angle);
-    const size  = this.baseSize + sinA * 4;
+    const size = this.baseSize + sinA * 4;
     let opacity = this.baseOpacity + sinA * 0.2;
-    let fade    = 1;
+    let fade = 1;
 
     if (!this.node) {
       if (textZone) {
@@ -270,13 +267,13 @@ class Particle {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CanvasAnimation({ currentSection, onLayoutChange }) {
-  const canvasRef    = useRef(null);
-  const stateRef     = useRef({
+  const canvasRef = useRef(null);
+  const stateRef = useRef({
     particles: [],
-    nodes:     [],
-    layout:    { fontSize: 22, textZone: null, photoZone: null },
-    mouse:     { x: -1000, y: -1000, radius: 150 },
-    rafId:     null,
+    nodes: [],
+    layout: { fontSize: 22, textZone: null, photoZone: null },
+    mouse: { x: -1000, y: -1000, radius: 150 },
+    rafId: null,
     resizeTimer: null,
   });
 
@@ -285,19 +282,18 @@ export default function CanvasAnimation({ currentSection, onLayoutChange }) {
     initGlyphCache();
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx   = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     const state = stateRef.current;
 
     // mouse / pointer
     const onMouseMove = (e) => { state.mouse.x = e.clientX; state.mouse.y = e.clientY; };
-    const onMouseOut  = ()  => { state.mouse.x = -1000;     state.mouse.y = -1000; };
+    const onMouseOut = () => { state.mouse.x = -1000; state.mouse.y = -1000; };
     window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseout',  onMouseOut);
+    window.addEventListener('mouseout', onMouseOut);
 
     // ── helpers ──
-    const isMobile = () => isMobileViewport(canvas.width);
-    const ETERNAL_COUNT = () => isMobile() ? 300 : 600;
-    const TEXT_COUNT    = () => isMobile() ? 600 : 1200;
+    const ETERNAL_COUNT = 600;
+    const TEXT_COUNT = 1200;
 
     const rebuildNodes = () => {
       const section = SECTIONS[currentSection];
@@ -326,17 +322,17 @@ export default function CanvasAnimation({ currentSection, onLayoutChange }) {
     };
 
     const resize = () => {
-      canvas.width  = window.innerWidth;
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       rebuildNodes();
     };
 
     // ── initial particle pool (once) ──
     if (state.particles.length === 0) {
-      canvas.width  = window.innerWidth;
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      const ec = ETERNAL_COUNT();
-      const tc = TEXT_COUNT();
+      const ec = ETERNAL_COUNT;
+      const tc = TEXT_COUNT;
       for (let i = 0; i < ec + tc; i++) {
         const p = new Particle(canvas.width, canvas.height);
         p.isEternalBackground = i < ec;
@@ -374,13 +370,13 @@ export default function CanvasAnimation({ currentSection, onLayoutChange }) {
           if (node.glitchTimer > 0) {
             node.glitchTimer--;
           } else if (Math.random() < 0.0003) {
-            node.glitchTimer  = Math.floor(Math.random() * 8) + 3;
-            node.char         = NUMBERS[Math.floor(Math.random() * NUMBERS.length)];
+            node.glitchTimer = Math.floor(Math.random() * 8) + 3;
+            node.char = NUMBERS[Math.floor(Math.random() * NUMBERS.length)];
             const big = Math.random() < 0.2;
             node.glitchOffsetX = (Math.random() - 0.5) * (big ? 15 : 5);
             node.glitchOffsetY = (Math.random() - 0.5) * (big ? 15 : 5);
           } else {
-            node.char          = node.originalChar;
+            node.char = node.originalChar;
             node.glitchOffsetX *= 0.85;
             node.glitchOffsetY *= 0.85;
           }
@@ -412,9 +408,9 @@ export default function CanvasAnimation({ currentSection, onLayoutChange }) {
     animate();
 
     return () => {
-      window.removeEventListener('resize',    onResize);
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseout',  onMouseOut);
+      window.removeEventListener('mouseout', onMouseOut);
       cancelAnimationFrame(state.rafId);
       clearTimeout(state.resizeTimer);
     };
